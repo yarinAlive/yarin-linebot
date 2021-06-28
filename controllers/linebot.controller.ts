@@ -7,7 +7,8 @@ import { UserService } from "../services/user.service";
 export class LinebotController {
   constructor(
     private client: Client,
-  ) {}
+  ) {
+  }
 
 
   public async echo(req: Request, res: Response): Promise<Response> {
@@ -17,12 +18,13 @@ export class LinebotController {
       events.map(async (event: WebhookEvent) => {
         try {
           const lineUserId = event.source.userId;
+          let displayName = ''
 
           if (lineUserId) {
-            UserService.retrieveUserProfile(lineUserId);
+            displayName = await UserService.retrieveUserProfile(lineUserId);
           }
 
-          await LinebotService.textEventHandler(event, this.client);
+          await LinebotService.textEventHandler(displayName, event, this.client);
         } catch (err: unknown) {
           if (err instanceof Error) {
             console.error(err);
